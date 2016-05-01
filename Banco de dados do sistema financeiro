@@ -1,0 +1,163 @@
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 COLLATE utf8_general_ci ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`operacoes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`operacoes` (
+  `idoperacoes` INT NOT NULL,
+  `receita` DOUBLE NULL,
+  `despesa` DOUBLE NULL,
+  PRIMARY KEY (`idoperacoes`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`tipo_operacao`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`tipo_operacao` (
+  `idtipo_operacao` INT NOT NULL,
+  `alimentaçao` TINYINT(1) NULL,
+  `contas` TINYINT(1) NULL,
+  `salario` TINYINT(1) NULL,
+  `aluguel` TINYINT(1) NULL,
+  `carro` TINYINT(1) NULL,
+  `outros` TINYINT(1) NULL,
+  PRIMARY KEY (`idtipo_operacao`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`observaçoes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`observaçoes` (
+  `idobservaçoes` INT NOT NULL,
+  `observaçoes` VARCHAR(45) NULL,
+  PRIMARY KEY (`idobservaçoes`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ta_opera`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`ta_opera` (
+  `idta_operacoes` INT NOT NULL,
+  `idoperacoes` INT NULL,
+  `idtipo_operacao` INT NULL,
+  `idobservaçoes` INT NULL,
+  PRIMARY KEY (`idta_operacoes`),
+  INDEX `fk_ta_opera_operacoes_idx` (`idoperacoes` ASC),
+  INDEX `fk_ta_opera_tipo_idx` (`idtipo_operacao` ASC),
+  INDEX `fk_ta_opera_obs_idx` (`idobservaçoes` ASC),
+  CONSTRAINT `fk_ta_opera_operacoes`
+    FOREIGN KEY (`idoperacoes`)
+    REFERENCES `mydb`.`operacoes` (`idoperacoes`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ta_opera_tipo`
+    FOREIGN KEY (`idtipo_operacao`)
+    REFERENCES `mydb`.`tipo_operacao` (`idtipo_operacao`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_ta_opera_obs`
+    FOREIGN KEY (`idobservaçoes`)
+    REFERENCES `mydb`.`observaçoes` (`idobservaçoes`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`dia`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`dia` (
+  `iddia` INT NOT NULL,
+  `dia` DATE NULL,
+  PRIMARY KEY (`iddia`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`mes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`mes` (
+  `idmes` INT NOT NULL,
+  `mes` DATE NULL,
+  PRIMARY KEY (`idmes`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`ano`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`ano` (
+  `idano` INT NOT NULL,
+  `ano` DATE NULL,
+  PRIMARY KEY (`idano`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`usuario` (
+  `idusuario` INT NOT NULL,
+  `nome` VARCHAR(45) NULL,
+  `last_name` VARCHAR(45) NULL,
+  `email` VARCHAR(45) NULL,
+  `pass` VARCHAR(45) NULL,
+  PRIMARY KEY (`idusuario`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`manager`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`manager` (
+  `idmanager` INT NOT NULL,
+  `idta_operacoes` INT NULL,
+  `idusuario` INT NULL,
+  `iddia` INT NULL,
+  `idmes` INT NULL,
+  `idano` INT NULL,
+  PRIMARY KEY (`idmanager`),
+  INDEX `fk_manager_ta_opera_idx` (`idta_operacoes` ASC),
+  INDEX `fk_manager_usuario_idx` (`idusuario` ASC),
+  INDEX `fk_manager_dia_idx` (`iddia` ASC),
+  INDEX `fk_manager_mes_idx` (`idmes` ASC),
+  INDEX `fk_manager_ano_idx` (`idano` ASC),
+  CONSTRAINT `fk_manager_ta_opera`
+    FOREIGN KEY (`idta_operacoes`)
+    REFERENCES `mydb`.`ta_opera` (`idta_operacoes`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_manager_usuario`
+    FOREIGN KEY (`idusuario`)
+    REFERENCES `mydb`.`usuario` (`idusuario`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_manager_dia`
+    FOREIGN KEY (`iddia`)
+    REFERENCES `mydb`.`dia` (`iddia`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_manager_mes`
+    FOREIGN KEY (`idmes`)
+    REFERENCES `mydb`.`mes` (`idmes`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `fk_manager_ano`
+    FOREIGN KEY (`idano`)
+    REFERENCES `mydb`.`ano` (`idano`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
